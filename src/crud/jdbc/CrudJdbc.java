@@ -1,20 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package crud.jdbc;
 
-/**
- *
- * @author narud
- */
-public class CrudJdbc {
+import java.sql.*;
+import javax.swing.JOptionPane;
 
-  /**
-   * @param args the command line arguments
-   */
-  public static void main(String[] args) {
-    // TODO code application logic here
+public class CrudJdbc {
+  Connection cn;
+
+  public void connect(String url, String user, String password) {
+    try {
+      cn = DriverManager.getConnection(url, user, password);
+      JOptionPane.showMessageDialog(null, "Conectado a la base de datos de forma exitosa con el usuario " + user + ".");
+    } catch (SQLException e) {
+      JOptionPane.showMessageDialog(null, "La conexión falló con el error: " + e.getMessage() + ".");
+    }
   }
-  
+
+  public void disconnect() {
+    if (cn != null) {
+      try {
+        cn.close();
+        JOptionPane.showMessageDialog(null, "Desconectando...");
+      } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "La desconexión falló con el error: " + e.getMessage() + ".");
+      }
+    }
+  }
+
+  public Connection getConnection() {
+    return cn;
+  }
 }
