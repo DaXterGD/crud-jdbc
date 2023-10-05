@@ -4,6 +4,7 @@ import crud.jdbc.CrudJdbc;
 import java.sql.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -13,9 +14,49 @@ public class Frame extends javax.swing.JFrame {
   String user = "root";
   String password = "";
   
+  public void clean() {
+    idInput.setText("");
+    productNameInput.setText("");
+    categoryInput.setText("");
+    priceInput.setText("");
+  }
+  
+  public void showTable(String value) {
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("ID");
+    model.addColumn("Nombre del producto");
+    model.addColumn("Categoría");
+    model.addColumn("Price");
+    table.setModel(model);
+
+    String query = "SELECT * FROM products WHERE CONCAT (product_name, '', category, '', price) LIKE '%" + value + "%'";
+    Object[] data = new Object[4];
+    DecimalFormat formatNumber = new DecimalFormat("#,###");
+    try {
+      Statement st = connection.getConnection().createStatement();
+      ResultSet rs = st.executeQuery(query);
+      rs.next();
+
+      do {
+        data[0] = rs.getInt("id");
+        data[1] = rs.getString("product_name");
+        data[2] = rs.getString("category");
+        data[3] = formatNumber.format(rs.getInt("price"));
+        System.out.println(rs.getString("product_name") + " : " + rs.getString("category") + " : " + rs.getInt("price"));
+        model.addRow(data);
+      } while (rs.next());
+      table.setModel(model);
+
+    } catch (SQLException e) {
+      JOptionPane.showMessageDialog(null, "No fue posible obtener los datos: " + e.getMessage() + ".");
+    }
+  }
+  
   public Frame() {
     initComponents();
     connection.connect(url, user, password);
+    clean();
+    showTable("");
     
     addWindowListener(new WindowAdapter() {
       @Override
@@ -74,8 +115,10 @@ public class Frame extends javax.swing.JFrame {
     idLabel.setForeground(new java.awt.Color(255, 255, 255));
     idLabel.setText("ID");
 
+    idInput.setEditable(false);
     idInput.setFont(new java.awt.Font("Josefin Sans", 0, 18)); // NOI18N
     idInput.setForeground(new java.awt.Color(40, 40, 40));
+    idInput.setEnabled(false);
     idInput.setName(""); // NOI18N
     idInput.setOpaque(true);
     idInput.addActionListener(new java.awt.event.ActionListener() {
@@ -228,7 +271,7 @@ public class Frame extends javax.swing.JFrame {
     tablePanelTitle.setForeground(new java.awt.Color(255, 255, 255));
     tablePanelTitle.setText("Productos registrados");
 
-    table.setFont(new java.awt.Font("Josefin Sans", 0, 12)); // NOI18N
+    table.setFont(new java.awt.Font("Josefin Sans", 0, 15)); // NOI18N
     table.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][] {
         {null, null, null, null},
@@ -307,15 +350,31 @@ public class Frame extends javax.swing.JFrame {
   }// </editor-fold>//GEN-END:initComponents
 
   private void priceInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_priceInputActionPerformed
-    // TODO add your handling code here:
+    
   }//GEN-LAST:event_priceInputActionPerformed
 
   private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-    // TODO add your handling code here:
+    try {
+      String query = "INSERT INTO products(product_name, category, price) VALUES(?, ?, ?)";
+      PreparedStatement ps = connection.getConnection().prepareStatement(query);
+
+      ps.setString(1, productNameInput.getText());
+      ps.setString(2, categoryInput.getText());
+      int price = Integer.parseInt(String.valueOf(priceInput.getText()));
+      ps.setInt(3, price);
+
+      ps.executeUpdate();
+      JOptionPane.showMessageDialog(null, "Producto insertado correctamente.");
+      showTable("");
+      ps.close();
+      clean();
+    } catch (SQLException e) {
+      JOptionPane.showMessageDialog(null, "No fue posible realizar la inserción: '" + e.getMessage() + "'.");
+    }
   }//GEN-LAST:event_saveButtonActionPerformed
 
   private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-    // TODO add your handling code here:
+    
   }//GEN-LAST:event_updateButtonActionPerformed
 
   private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
