@@ -298,6 +298,11 @@ public class Frame extends javax.swing.JFrame {
         return canEdit [columnIndex];
       }
     });
+    table.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mouseClicked(java.awt.event.MouseEvent evt) {
+        tableMouseClicked(evt);
+      }
+    });
     jScrollPane1.setViewportView(table);
     if (table.getColumnModel().getColumnCount() > 0) {
       table.getColumnModel().getColumn(0).setResizable(false);
@@ -374,7 +379,29 @@ public class Frame extends javax.swing.JFrame {
   }//GEN-LAST:event_saveButtonActionPerformed
 
   private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-    
+    try {
+      String query = "UPDATE products SET product_name = ?, category = ?, price = ? WHERE id = ?";
+      PreparedStatement ps = connection.getConnection().prepareStatement(query);
+
+      ps.setString(1, productNameInput.getText());
+      ps.setString(2, categoryInput.getText());
+      int intPrice = Integer.parseInt(String.valueOf(priceInput.getText()));
+      int intId = Integer.parseInt(idInput.getText());
+      ps.setInt(3, intPrice);
+      ps.setInt(4, intId);
+
+      int affectedRows = ps.executeUpdate();
+      if (affectedRows >= 1) {
+        JOptionPane.showMessageDialog(null, "Producto actualizado correctamente.");
+        showTable("");
+        ps.close();
+        clean();
+      } else {
+        JOptionPane.showMessageDialog(null, "El producto enviado no fue encontrado en la tabla.");
+      }
+    } catch (SQLException e) {
+      JOptionPane.showMessageDialog(null, "No fue posible realizar la actualización: " + e.getMessage() + ".");
+    }
   }//GEN-LAST:event_updateButtonActionPerformed
 
   private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
@@ -388,6 +415,17 @@ public class Frame extends javax.swing.JFrame {
   private void idInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idInputActionPerformed
     // TODO add your handling code here:
   }//GEN-LAST:event_idInputActionPerformed
+
+  private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+    int rows = this.table.getSelectedRow();
+    this.idInput.setText(this.table.getValueAt(rows, 0).toString());
+    this.productNameInput.setText(this.table.getValueAt(rows, 1).toString());
+    this.categoryInput.setText(this.table.getValueAt(rows, 2).toString());
+    String stringPrice = String.valueOf(this.table.getValueAt(rows, 3));
+    String priceReplaced = stringPrice.replace(",", "");
+    System.out.println(priceReplaced);
+    this.priceInput.setText(priceReplaced);
+  }//GEN-LAST:event_tableMouseClicked
 
   public static void main(String args[]) {
     /* Set the Nimbus look and feel */
