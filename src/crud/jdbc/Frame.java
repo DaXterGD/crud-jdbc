@@ -405,7 +405,22 @@ public class Frame extends javax.swing.JFrame {
   }//GEN-LAST:event_updateButtonActionPerformed
 
   private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-    // TODO add your handling code here:
+    try {
+      String query = "DELETE FROM products WHERE product_name = ? AND id = ?";
+      PreparedStatement ps = connection.getConnection().prepareStatement(query);
+
+      ps.setString(1, productNameInput.getText());
+      int intId = Integer.parseInt(idInput.getText());
+      ps.setInt(2, intId);
+
+      ps.executeUpdate();
+      JOptionPane.showMessageDialog(null, "Producto eliminado correctamente.");
+      showTable("");
+      ps.close();
+      clean();
+    } catch (SQLException e) {
+      JOptionPane.showMessageDialog(null, "No fue posible eliminar el producto: '" + e.getMessage() + "'.");
+    }
   }//GEN-LAST:event_deleteButtonActionPerformed
 
   private void cleanButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanButtonActionPerformed
@@ -423,7 +438,6 @@ public class Frame extends javax.swing.JFrame {
     this.categoryInput.setText(this.table.getValueAt(rows, 2).toString());
     String stringPrice = String.valueOf(this.table.getValueAt(rows, 3));
     String priceReplaced = stringPrice.replace(",", "");
-    System.out.println(priceReplaced);
     this.priceInput.setText(priceReplaced);
   }//GEN-LAST:event_tableMouseClicked
 
