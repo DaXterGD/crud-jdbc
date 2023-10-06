@@ -424,7 +424,7 @@ public class Frame extends javax.swing.JFrame {
   }//GEN-LAST:event_deleteButtonActionPerformed
 
   private void cleanButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanButtonActionPerformed
-    // TODO add your handling code here:
+    clean();
   }//GEN-LAST:event_cleanButtonActionPerformed
 
   private void idInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idInputActionPerformed
